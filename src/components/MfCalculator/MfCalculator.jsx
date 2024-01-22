@@ -46,6 +46,8 @@ const MfCalculator = () => {
   if (Value !== null) {
     console.log(Value);
   }
+  // NAV VALUE FROM DATA -----------------
+  const navValue = Value;
 
   const [selectedTab, setSelectedTab] = useState(0);
   const [amountInput, setAmountInput] = useState("");
@@ -74,8 +76,7 @@ const MfCalculator = () => {
   // }, []);
   // CORS POLICY ISSUE COPY DATA CREATED IN DATA/DATA.JSON
 
-  const navValue = Value;
-
+  // STYLES ARE DEFINED HERE -------------------
   const appBarStyle = {
     backgroundColor: "#4CAF50",
     height: 90,
@@ -105,6 +106,7 @@ const MfCalculator = () => {
     color: "#2243b6",
   };
 
+  // AMOUNT INPUT FUNCTION
   const handleAmountInputChange = (event) => {
     const value = event.target.value;
     setAmountInput(value);
@@ -123,6 +125,7 @@ const MfCalculator = () => {
     }
   };
 
+  // UNIT INPUT FUCNTION
   const handleUnitsInputChange = (event) => {
     const value = event.target.value;
     setUnitsInput(value);
