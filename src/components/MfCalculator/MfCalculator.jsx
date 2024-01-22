@@ -9,6 +9,14 @@ import {
   Tab,
   TextField,
 } from "@mui/material";
+import {
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  styled,
+} from "@mui/material";
+
 import { useSelector } from "react-redux";
 
 // Function to calculate 'units'
@@ -25,29 +33,7 @@ const MfCalculator = () => {
   const navData = useSelector((state) => state.navData);
   console.log(navData, "navDatafromstore");
 
-  function getNav(navData, schemeName) {
-    // Finding the particular scheneName
-    const nav =
-      navData
-        .flatMap((brand) => brand.schemes)
-        .find((scheme) => scheme.schemeName === schemeName)?.nav ?? null;
-
-    if (nav !== null) {
-      // searching the nav value
-      return nav;
-    } else {
-      return null;
-    }
-  }
-
-  //  usage
-  const Value = getNav(navData, "Motilal Oswal Liquid Fund - Direct Growth");
-
-  if (Value !== null) {
-    console.log(Value);
-  }
   // NAV VALUE FROM DATA -----------------
-  const navValue = Value;
 
   const [selectedTab, setSelectedTab] = useState(0);
   const [amountInput, setAmountInput] = useState("");
@@ -59,22 +45,62 @@ const MfCalculator = () => {
     setUnitsInput("");
   };
 
-  // const apicall = async () => {
-  //   await fetch("https://www.amfiindia.com/spages/NAVAll.txt?t=18022020035513")
-  //     .then((res) => {
-  //       setdata(res);
-  //       console.log(data);
-  //     })
-  //     .catch((error) => {
-  //       setdataerr(error);
-  //       console.log(dataerr);
-  //     });
-  // };
+  const [selectedTitle, setSelectedTitle] = useState("");
+  const [selectedScheme, setSelectedScheme] = useState("");
 
-  // useEffect(() => {
-  //   apicall();
-  // }, []);
+  const titleOptions = navData?.map((titleData) => ({
+    key: titleData?.id,
+    value: titleData.title,
+    label: titleData.title,
+    schemes: titleData.schemes,
+  }));
+
+  // Options for the schemes dropdown
+  const schemeOptions = selectedTitle
+    ? titleOptions
+        .find((title) => title.value === selectedTitle)
+        ?.schemes.map((scheme) => ({
+          value: scheme.nav,
+          label: scheme.schemeName,
+          key: scheme.schemeCode,
+        }))
+    : [];
+
+  const handleTitleChange = (event) => {
+    const selectedTitle = event.target.value;
+    setSelectedTitle(selectedTitle);
+    // EMPTY UNLESS THE TITLE IS SELCTED
+    setSelectedScheme("");
+  };
+
+  const [selectedSchemeNav, setSelectedSchemeNav] = useState(null);
+
+  const handleSchemeChange = (event) => {
+    const selectedSchemeValue = event.target.value;
+    const selectedSchemeObject = schemeOptions.find(
+      (scheme) => scheme.value === selectedSchemeValue
+    );
+    const newValue = selectedSchemeObject ? selectedSchemeObject.value : null;
+    setSelectedSchemeNav(newValue);
+
+    setSelectedScheme(selectedSchemeValue);
+  };
+
+  // SELECTED FROM THE SELECTED SCHEME THIS NAV VALUE IS BEING USED IN THE CALCULATION ---------------------
+  const navValue = selectedSchemeNav;
+
+  // CORS policy not working
+
+  // ("https://www.amfiindia.com/spages/NAVAll.txt?t=18022020035513")
+
   // CORS POLICY ISSUE COPY DATA CREATED IN DATA/DATA.JSON
+
+  const StyledFormControl = styled(FormControl)(({ theme }) => ({
+    marginRight: theme.spacing(1),
+    marginLeft: theme.spacing(1),
+    minWidth: 150,
+    width: "100%",
+  }));
 
   // STYLES ARE DEFINED HERE -------------------
   const appBarStyle = {
@@ -154,7 +180,7 @@ const MfCalculator = () => {
           </Typography>
         </Toolbar>
       </AppBar>
-      <div style={{ marginLeft: "2%", marginRight: "2%" }}>
+      <div style={{ marginLeft: "2%", marginRight: "2%", paddingBottom: "5%" }}>
         <Typography
           variant="subtitle1"
           style={{
@@ -181,6 +207,69 @@ const MfCalculator = () => {
             <Tab label="Units" value={1} />
           </Tabs>
         </Paper>
+
+        <Typography
+          variant="subtitle1"
+          style={{
+            marginTop: "10px",
+            padding: "2%",
+            fontWeight: "600",
+            textAlign: "center",
+          }}
+        >
+          Start by selecting a company to discover the schemes available for
+          your preference.
+        </Typography>
+
+        <Container maxWidth="md" style={{ width: "100%" }}>
+          <Paper style={{ padding: "20px", marginTop: "20px" }}>
+            <div style={{ display: "flex" }}>
+              <StyledFormControl variant="outlined">
+                <InputLabel id="company-label">Company</InputLabel>
+                <Select
+                  labelId="company-label"
+                  label="Company"
+                  autoWidth
+                  value={selectedTitle}
+                  onChange={handleTitleChange}
+                >
+                  <MenuItem value="" disabled>
+                    Select a Company
+                  </MenuItem>
+                  {titleOptions.map((option, index) => (
+                    <MenuItem key={index} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </StyledFormControl>
+
+              {/* Schemes Dropdown */}
+              <StyledFormControl variant="outlined">
+                <InputLabel id="scheme-label" style={{ whiteSpace: "normal" }}>
+                  Scheme
+                </InputLabel>
+                <Select
+                  labelId="scheme-label"
+                  label="Scheme"
+                  value={selectedScheme}
+                  onChange={handleSchemeChange}
+                  disabled={!selectedTitle}
+                  autoWidth
+                >
+                  <MenuItem value="" disabled>
+                    Select a Scheme
+                  </MenuItem>
+                  {schemeOptions.map((option, index) => (
+                    <MenuItem key={index} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </StyledFormControl>
+            </div>
+          </Paper>
+        </Container>
 
         {/* Main Content */}
         <Container maxWidth="md" style={containerStyle}>
@@ -215,7 +304,7 @@ const MfCalculator = () => {
                 label="NAV"
                 variant="outlined"
                 fullWidth
-                value={navValue}
+                value={selectedScheme ? selectedScheme : ""}
                 InputProps={{
                   readOnly: true,
                   style: { outline: "none" },
@@ -235,6 +324,14 @@ const MfCalculator = () => {
                 fullWidth
                 value={selectedTab === 0 ? unitsInput : amountInput}
                 style={resultStyle}
+                sx={{
+                  "& .MuiInputBase-input.MuiOutlinedInput-input.Mui-disabled": {
+                    opacity: 1,
+                    WebkitTextFillColor: "#1976d2",
+                    fontWeight: "bold",
+                    fontSize: 20,
+                  },
+                }}
               />
             )}
           </Paper>
@@ -251,6 +348,14 @@ const MfCalculator = () => {
                 fullWidth
                 value={selectedTab === 0 ? unitsInput : amountInput}
                 style={resultStyle}
+                sx={{
+                  "& .MuiInputBase-input.MuiOutlinedInput-input.Mui-disabled": {
+                    opacity: 1,
+                    WebkitTextFillColor: "#1976d2",
+                    fontWeight: "bold",
+                    fontSize: 20,
+                  },
+                }}
               />
             )}
           </div>
