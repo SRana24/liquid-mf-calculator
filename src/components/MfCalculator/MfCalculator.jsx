@@ -31,7 +31,7 @@ const MfCalculator = () => {
     return units * nav;
   }
 
-  // NAV VALUE FROM DATA -----------------
+  //DATA FROM STORE  -----------------
 
   const navData = useSelector((state) => state.navData);
   console.log(navData, "navDatafromstore");
@@ -46,9 +46,12 @@ const MfCalculator = () => {
     setUnitsInput("");
   };
 
+  // BELOW STATES ARE FOR 2 INPUTS OF COMPANY AND SCHEME
+
   const [selectedTitle, setSelectedTitle] = useState("");
   const [selectedScheme, setSelectedScheme] = useState("");
 
+  // title options drop down
   const titleOptions = navData?.map((titleData) => ({
     key: titleData?.id,
     value: titleData.title,
@@ -74,6 +77,7 @@ const MfCalculator = () => {
     setSelectedScheme("");
   };
 
+  // use state store the NAV value from the selected scheme and setting it in the state
   const [selectedSchemeNav, setSelectedSchemeNav] = useState(null);
 
   const handleSchemeChange = (event) => {
@@ -184,10 +188,11 @@ const MfCalculator = () => {
           Start by selecting a company to discover the schemes available for
           your preference.
         </Typography>
-
+        {/* Imputs for company and scheme  */}
         <Container maxWidth="md" style={{ width: "100%" }}>
           <Paper style={{ padding: "20px", marginTop: "20px" }}>
             <div style={{ display: "flex" }}>
+              {/* Title dropdown */}
               <StyledFormControl variant="outlined">
                 <InputLabel id="company-label">Company</InputLabel>
                 <Select
@@ -241,7 +246,7 @@ const MfCalculator = () => {
           </Paper>
         </Container>
 
-        {/* Main Content */}
+        {/* Main content for units , amounts and NAV*/}
         <Container maxWidth="md" style={containerStyle}>
           <Paper style={{ padding: "20px", marginTop: "20px" }}>
             <div style={rowContainerStyle}>
