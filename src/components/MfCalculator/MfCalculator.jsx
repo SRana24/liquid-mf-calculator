@@ -8,6 +8,7 @@ import {
   Tabs,
   Tab,
   TextField,
+  FormHelperText,
 } from "@mui/material";
 import {
   Select,
@@ -19,21 +20,21 @@ import {
 
 import { useSelector } from "react-redux";
 
-// Function to calculate 'units'
-function calculateUnits(amount, nav) {
-  return amount / nav;
-}
-
-// Function to calculate 'amount'
-function calculateAmount(units, nav) {
-  return units * nav;
-}
-
 const MfCalculator = () => {
-  const navData = useSelector((state) => state.navData);
-  console.log(navData, "navDatafromstore");
+  //  function to calculate 'units'
+  function calculateUnits(amount, nav) {
+    return amount / nav;
+  }
+
+  // function to calculate 'amount'
+  function calculateAmount(units, nav) {
+    return units * nav;
+  }
 
   // NAV VALUE FROM DATA -----------------
+
+  const navData = useSelector((state) => state.navData);
+  console.log(navData, "navDatafromstore");
 
   const [selectedTab, setSelectedTab] = useState(0);
   const [amountInput, setAmountInput] = useState("");
@@ -69,7 +70,7 @@ const MfCalculator = () => {
   const handleTitleChange = (event) => {
     const selectedTitle = event.target.value;
     setSelectedTitle(selectedTitle);
-    // EMPTY UNLESS THE TITLE IS SELCTED
+    // making it empty unitll the title is selected and then the scheme funciton below
     setSelectedScheme("");
   };
 
@@ -95,48 +96,11 @@ const MfCalculator = () => {
 
   // CORS POLICY ISSUE COPY DATA CREATED IN DATA/DATA.JSON
 
-  const StyledFormControl = styled(FormControl)(({ theme }) => ({
-    marginRight: theme.spacing(1),
-    marginLeft: theme.spacing(1),
-    minWidth: 150,
-    width: "100%",
-  }));
-
-  // STYLES ARE DEFINED HERE -------------------
-  const appBarStyle = {
-    backgroundColor: "#4CAF50",
-    height: 90,
-    justifyContent: "center",
-    alignItems: "center",
-  };
-
-  const containerStyle = {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  };
-
-  const rowContainerStyle = {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  };
-
-  const columnChildStyle = {
-    width: "48%",
-  };
-  const resultStyle = {
-    flex: 1,
-    marginTop: "6%",
-    color: "#2243b6",
-  };
-
   // AMOUNT INPUT FUNCTION
   const handleAmountInputChange = (event) => {
     const value = event.target.value;
     setAmountInput(value);
-    // Checking the value
+    // see the value
     if (!isNaN(value)) {
       const calculatedUnits = calculateUnits(parseFloat(value), navValue);
       // after the calculation to check if the the is valid
@@ -155,7 +119,7 @@ const MfCalculator = () => {
   const handleUnitsInputChange = (event) => {
     const value = event.target.value;
     setUnitsInput(value);
-    // Checking the value
+    // see the value
     if (!isNaN(value)) {
       const calculatedAmount = calculateAmount(parseFloat(value), navValue);
       // after the calculation to check if the the is valid
@@ -242,6 +206,9 @@ const MfCalculator = () => {
                     </MenuItem>
                   ))}
                 </Select>
+                <FormHelperText>
+                  {!selectedTitle ? "Please select a company first." : ""}
+                </FormHelperText>
               </StyledFormControl>
 
               {/* Schemes Dropdown */}
@@ -266,6 +233,9 @@ const MfCalculator = () => {
                     </MenuItem>
                   ))}
                 </Select>
+                <FormHelperText>
+                  {!selectedTitle ? "Please select a Scheme." : ""}
+                </FormHelperText>
               </StyledFormControl>
             </div>
           </Paper>
@@ -285,6 +255,12 @@ const MfCalculator = () => {
                   inputProps={{ pattern: "[0-9]*" }}
                   onChange={handleAmountInputChange}
                   style={columnChildStyle}
+                  disabled={!selectedTitle || !selectedScheme}
+                  helperText={
+                    !selectedTitle || !selectedScheme
+                      ? "Please select a Compay and a Scheme"
+                      : ""
+                  }
                 />
               )}
               {selectedTab === 1 && (
@@ -297,6 +273,12 @@ const MfCalculator = () => {
                   type="number"
                   inputProps={{ pattern: "[0-9]*" }}
                   onChange={handleUnitsInputChange}
+                  disabled={!selectedTitle || !selectedScheme}
+                  helperText={
+                    !selectedTitle || !selectedScheme
+                      ? "Please select a Compay and a Scheme"
+                      : ""
+                  }
                 />
               )}
 
@@ -363,6 +345,43 @@ const MfCalculator = () => {
       </div>
     </div>
   );
+};
+
+// STYLES ARE DEFINED HERE -------------------
+const StyledFormControl = styled(FormControl)(({ theme }) => ({
+  marginRight: theme.spacing(1),
+  marginLeft: theme.spacing(1),
+  minWidth: 150,
+  width: "100%",
+}));
+
+const appBarStyle = {
+  backgroundColor: "#4CAF50",
+  height: 90,
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+const containerStyle = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+};
+
+const rowContainerStyle = {
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "space-between",
+  width: "100%",
+};
+
+const columnChildStyle = {
+  width: "48%",
+};
+const resultStyle = {
+  flex: 1,
+  marginTop: "6%",
+  color: "#2243b6",
 };
 
 export default MfCalculator;
